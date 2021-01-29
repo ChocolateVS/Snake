@@ -16,6 +16,7 @@ let dx = 1;
 let dy = 0;
 let req;
 let paused = false;
+let moved = false;
 
 canvas.width = cellSize * boardW;
 canvas.height = cellSize * boardH;
@@ -52,7 +53,12 @@ function animate() {
     c.fillRect(0, 0, width, height);
     count++;
     if (count == countTo) {
-        move();
+        if (!moved) {
+            move();
+        } else {
+            moved = false;
+        }
+        
         if (snake[0][0] == apple.x && snake[0][1] == apple.y) {
             score += 1;
             scr.innerHTML = score;
@@ -77,12 +83,12 @@ function animate() {
 }
 
 function move() {
-    let x;
-    let y;
-    x = snake[0][0] + (dx * cellSize);
-    y = snake[0][1] + (dy * cellSize); 
-    snake.unshift([x, y]);
-    snake.pop();
+        let x;
+        let y;
+        x = snake[0][0] + (dx * cellSize);
+        y = snake[0][1] + (dy * cellSize); 
+        snake.unshift([x, y]);
+        snake.pop();
     //console.log(snake);
 }
 
@@ -120,6 +126,8 @@ function getApple () {
 document.addEventListener("keydown", keyPress);
 
 function keyPress(e) {
+    let x;
+    let y;
     if (e.keyCode == 82) { //RESTART
         start();
     }
@@ -130,24 +138,32 @@ function keyPress(e) {
         if (snake.length == 1 || dy != 1 && snake.length > 1) {
             dy = -1;
             dx = 0;   
+            move();
+            moved = true;
         }
     }
     if (e.keyCode == 65 || e.keyCode == 37) { //LEFT
         if (snake.length == 1 || dx != 1 && snake.length > 1) {
             dy = 0;
             dx = -1;
+            move();
+            moved = true;
         }
     }
     if (e.keyCode == 68 || e.keyCode == 39) { //RIGHT
         if (snake.length == 1 || dx != -1 && snake.length > 1) {
             dy = 0;
             dx = 1;
+            move();
+            moved = true;
         }
     }
     if (e.keyCode == 83 || e.keyCode == 40) { //DOWN
         if (snake.length == 1 || dy != -1 && snake.length > 1) {
             dy = 1;
             dx = 0;
+            move();
+            moved = true;
         }
     }
 }
