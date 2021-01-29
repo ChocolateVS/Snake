@@ -17,7 +17,16 @@ let dy = 0;
 let req;
 let paused = false;
 let moved = false;
+let teleport = false;
 
+id("teleport").addEventListener('change', function() {
+    if (this.checked) {
+        teleport = true;
+    }
+    else {
+        teleport = false;
+    }
+})
 canvas.width = cellSize * boardW;
 canvas.height = cellSize * boardH;
 
@@ -46,7 +55,6 @@ function start() {
 function animate() {
     speed = score;
     countTo = Math.round(10 - (speed * (score/100)));
-    console.log(countTo);
     req = requestAnimationFrame(animate);
     c.clearRect(0, 0, width, height);
     c.fillStyle = "rgba(0, 0, 0, 0)";
@@ -67,9 +75,26 @@ function animate() {
             snake.push([x, y]);
             getApple();
         }
-        if (snake[0][0] < 0 || snake[0][0] + cellSize > width || snake[0][1] < 0 || snake[0][1] + cellSize > height) {
-            let msg = deathMsg();
-            death(msg);
+        console.log(teleport);
+        if (!teleport) {
+            if (snake[0][0] < 0 || snake[0][0] + cellSize > width || snake[0][1] < 0 || snake[0][1] + cellSize > height) {
+                let msg = deathMsg();
+                death(msg);
+            }
+        }
+        else if (teleport) {
+            if (snake[0][0] < 0) {
+                snake[0][0] = width - cellSize;
+            } 
+            if (snake[0][0] + cellSize > width) {
+                snake[0][0] = 0;
+            }
+            if (snake[0][1] < 0) {
+                snake[0][1] = height - cellSize;
+            }
+            if (snake[0][1] + cellSize > height) {
+                snake[0][1] = 0;
+            }
         }
         for (let i = 1; i < snake.length; i++) {
             if (snake[0][0] == snake[i][0] && snake[0][1] == snake[i][1]) {   
@@ -89,7 +114,6 @@ function move() {
         y = snake[0][1] + (dy * cellSize); 
         snake.unshift([x, y]);
         snake.pop();
-    //console.log(snake);
 }
 
 function draw() {
