@@ -33,3 +33,7 @@ body {
 .h1 {
     font-size:3rem;
 }
+
+select, option {
+    color:black;
+}

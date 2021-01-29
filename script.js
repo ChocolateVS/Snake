@@ -3,12 +3,10 @@ function id(id) { return document.getElementById(id); }
 let scr = id("score");
 let canvas = id("canvas");
 let snake = [];
-let score = 0;
 let gameSpeed = 100;
 let boardW = 40;
 let boardH = 30;
 let cellSize = 20;
-let speed = 0;
 let cells = boardH * boardW;
 let startCell = [(boardW/2) * cellSize, (boardH/2) * cellSize];
 let apple = {};
@@ -18,6 +16,9 @@ let req;
 let paused = false;
 let moved = false;
 let teleport = false;
+let auto = true;
+let diffs = [10, 8, 6, 4, 3, 2];
+let difficulty = 0;
 
 id("teleport").addEventListener('change', function() {
     if (this.checked) {
@@ -26,7 +27,21 @@ id("teleport").addEventListener('change', function() {
     else {
         teleport = false;
     }
-})
+});
+
+id("diff").addEventListener('change', function() {
+    if (this.checked) {
+        auto = true;
+    }
+    else {
+        auto = false;
+    }
+});
+
+id("options").addEventListener('change', function() {
+    difficulty = id("options").value;
+});
+
 canvas.width = cellSize * boardW;
 canvas.height = cellSize * boardH;
 
@@ -35,8 +50,12 @@ let height = canvas.height;
 
 let c = canvas.getContext("2d");
 
+let score = 0;
 let count = 0;
 let countTo = 10;
+
+//Starts at 6/sec
+
 
 function start() {
     cancelAnimationFrame(req);
@@ -53,9 +72,21 @@ function start() {
 
 
 function animate() {
-    speed = score;
-    countTo = Math.round(10 - (speed * (score/100)));
     req = requestAnimationFrame(animate);
+    
+    if (auto) {
+        if (score <= 100) {
+            countTo = 10 - Math.round(score / 15); 
+        }
+        else {
+            countTo = 4;
+        }
+    }
+    else if (!auto) {
+        let a = parseInt(difficulty);
+        countTo = diffs[a] ;
+        console.log(countTo);
+    }
     c.clearRect(0, 0, width, height);
     c.fillStyle = "rgba(0, 0, 0, 0)";
     c.fillRect(0, 0, width, height);
@@ -75,7 +106,6 @@ function animate() {
             snake.push([x, y]);
             getApple();
         }
-        console.log(teleport);
         if (!teleport) {
             if (snake[0][0] < 0 || snake[0][0] + cellSize > width || snake[0][1] < 0 || snake[0][1] + cellSize > height) {
                 let msg = deathMsg();
